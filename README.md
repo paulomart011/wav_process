@@ -394,7 +394,7 @@ Si el proceso se detiene por carga de archivos, se debe revisar que esta generan
 
 ## 6. Listado en BD y en CSV:
 
-En un servidor Windows (puede ser el MW), crear la carpeta tmpAudios por ejemplo:
+En un servidor Windows (puede ser el MW), crear la carpeta tmpAudios por ejemplo (modificar según el disco que se tenga):
 ```
 R:\tmpAudios
 ```
@@ -462,16 +462,25 @@ Luego crear la siguiente ruta en el SFTP:
 ```
 /procesados/listasAudios/
 ```
+Luego, subir el proceso de listado de audios "Ejecutable.zip" (carpeta 6. Listado en BD y CSV), y mediante un task scheduler poner que se ejecute de forma diaria en la madrugada. Lo que hara el proceso es listar todos los archivos del audio anterior.
+En el archivo appSettings.json modificar las siguientes lineas en base a lo requerido:
+```
+{
+  "sftpHost": "usftpcorp.inconcertcc.com",   									//dominio del SFTP
+  "sftpPath": "/speechanalytics/",   	     									//ruta raíz del SFTP
+  "sftpArchivoLista": "/procesados/listasAudios/", 								//ruta del SFTP donde se depositarán los archivos CSV
+  "sftpFingerPrint": "ssh-ed25519 255 sCK7lIz3IYhHCDmzVl4LhWbN2rdTBi0FOnlet7C9ZQQ",				//fingerprint para conexion al SFTP
+  "sftpUsername": "womcolombia-user",										//usuario SFTP
+  "sftpPassword": "pwd",											//password SFTP
+  "rutaArchivoCSV": "r:\\tmpAudios\\fileDetails.csv",								//ruta del server MW para referenciar la generación del archivo
+  "spBulk": "EXEC WomVentas..BulkArchivosAudios;",								//SP de bulk de data
+  "cabecera": "file;location;creationDate",									//cabecera fija (no cambia)
+  "dataSource": "Data Source=172.16.227.114;Initial Catalog=WomVentas;User ID=UsrAccMw;Password=poner_pwd",	//definicion de la BD a usar
+  "timeout_win": "10",												//timeout de conexion en segundos
+  "diaListar": "1"												//dia atras que se listara (en 1 significa que listará los archivos del dia anterior)
+}
+```
 
-
-
-
-
-
-
-
-
-
-
-
+Este proceso generará los registros en BD y en un CSV.
+Si se requiere revisar las fuentes, se encuentran en el zip "ListarAudiosSFTP"
 
