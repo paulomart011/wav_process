@@ -1,11 +1,12 @@
 # PROCESO MIXEO EN WAV EN PBX Y SUBIDA DE AUDIOS A SFTP
 Speech Analytics habitualmente toma los audios Mixeados en WAV del repositorio de audios alojado en el MW, sin embargo dado que wav ocupa gran cantidad de espacio (se llego a observar en algunos clientes de más de 2TB en 3 meses), se decide configurar un proceso que lleve este Mixeo en WAV a un repositorio dedicado SFTP, para esto los pasos a configurar son los siguientes:
 
-1. En cada PBX se configura el mixeo y la subida a un FTP alojado en un servidor intermedio Linux (se debe pedir a Infra que agregue este servidor al ambiente).
-
-2. En el servidor intermedio Linux, se tiene el FTP con la carpeta que contiene los audios provenientes de todas las PBX del ambiente. Se debe configurar un .sh que se encargara de mover estos audios al repositorio SFTP indicado.
-
-3. En el MW o un servidor Windows, se deberá configurar un proceso diario (nocturno) que revise en el SFTP externo los audios del dia generados, los guarde en una tabla SQL y genere un csv en este repositorio.
+1. Se debe configurar en un servidor un FTP, este servirá como paso intermedio entre las PBXs y el SFTP final.
+2. Se debe implementar el proceso de carga de archivos del FTP al SFTP.
+3. Se debe definir el listado de camapañas cuyos audios se generarán en formato WAV.
+4. En cada PBX se configura el mixeo y la subida al FTP alojado en el servidor intermedio Linux del punto 1.
+5. Se debe configurar alarmas en el servidor intermedio Linux y en las PBXs por si ocurre una acumulación excesiva de archivos.
+6. En el MW o un servidor Windows, se deberá configurar un proceso diario (nocturno) que revise en el SFTP externo los audios del dia generados, los guarde en una tabla SQL y genere un csv en este repositorio.
 
 Cada uno de estos puntos estan colocados en sus respectivas carpetas:
 
@@ -14,6 +15,7 @@ Cada uno de estos puntos estan colocados en sus respectivas carpetas:
 3. Configurar filtrado para generación de WAV (3. Filtrado de generacion WAV por campaña)
 4. Configurar en PBX para carga a FTP (4. Servidor PBX)
 5. Alarmas en PBX y servidor intermedio Linux (5. Alarmas)
+6. Listado en BD y CSV (6. Listado en BD y CSV)
 
 
 ## 0. Repositorios:
@@ -394,4 +396,87 @@ Agregar al contrab la siguiente linea
 
 Con esto se estará validando cada minuto la cantidad de archivos de las carpetas de GrabacionesWAV y GrabacionesWAVFailed de las PBXs.
 Si el proceso se detiene por carga de archivos, se debe revisar que esta generando el encolamiento, posterior a ello se puede activar el proceso de control poniendo "EJECUTAR" como contenido del archivo de control.
+
+## 6. Listado en BD y en CSV:
+
+En un servidor Windows (puede ser el MW), crear la carpeta tmpAudios por ejemplo:
+```
+R:\tmpAudios
+```
+Y en su interior crear un archivo vacio llamado fileDetails.csv
+Finalmente, dar clic derecho en la carpeta, poner SharedWith>SpecificPeople>Everyone y dar en Aceptar. Deberá aparecer una pantalla con una ruta como esta:
+```
+\\MW1-A6BC9\tmpAudios
+```
+Esta es la ruta compartida que se usará desde la BD para dejar el archivo CSV.
+
+En la tabla de negocio se deberá crear la siguiente tabla:
+```
+USE [WomVentas]
+GO
+
+/****** Object:  Table [dbo].[DatosArchivosAudios]    Script Date: 04/04/2024 1:23:14 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[DatosArchivosAudios](
+	[file] [varchar](500) NOT NULL,
+	[location] [varchar](500) NULL,
+	[creationDate] [date] NULL,
+ CONSTRAINT [PK_DatosArchivosAudios] PRIMARY KEY CLUSTERED 
+(
+	[file] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+```
+En la tabla de negocio se deberá crear el siguiente sp:
+```
+USE [WomVentas]
+GO
+/****** Object:  StoredProcedure [dbo].[BulkArchivosAudios]    Script Date: 04/04/2024 1:25:01 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [dbo].[BulkArchivosAudios]
+AS
+BEGIN
+	BEGIN TRY
+		bulk insert dbo.DatosArchivosAudios
+		from '\\MW1-A6BC9\tmpAudios\fileDetails.csv'
+		with
+		(
+			FIRSTROW = 2 ,
+			FIELDTERMINATOR = ';',
+			ROWTERMINATOR = '\n', 
+			MAXERRORS = 1000000000,
+			CODEPAGE = 'ACP'
+		)
+	END TRY
+	BEGIN CATCH
+	END CATCH
+END
+```
+
+Luego crear la siguiente ruta en el SFTP:
+```
+/procesados/listasAudios/
+```
+
+
+
+
+
+
+
+
+
+
+
+
 
