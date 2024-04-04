@@ -120,14 +120,9 @@ nano /etc/crontab
 * * * * * root /usr/sbin/UploadFilesToSFTP.sh 5;
 * * * * * root /usr/sbin/UploadFilesToSFTP.sh 6;
 ```
-En la ruta principal del SFTP deben existira las careptas:
+En la ruta principal del SFTP deben existir las careptas:
 ```
-speechanalytics1
-speechanalytics2
-speechanalytics3
-speechanalytics4
-speechanalytics5
-speechanalytics6
+speechanalytics
 ```
 Con esto, ya se puede validar dejando una archivo en la ruta del FTP y ver si lo transfiere adecuadamente al SFTP final.
 
