@@ -301,7 +301,7 @@ Una vez realizado ello, ya comenzarán a generarse audios WAV para las campañas
 ## 5. Alarmas en PBX y servidor intermedio Linux:
 Para el proceso se configura una alarma que valida la cantidad de archivos y en caso el número sea elevado envia una notificación email.
 
-Para ello primero se debe instalar la libreria msmtp en el servidor linux (validar si el servidor Linux ya lo tiene instalado accediendo al archivo "nano ~/.msmtprc")  y las PBXs (no requiere ningún reinicio):
+Para ello primero se debe instalar la libreria msmtp en el servidor linux y las PBXs (no requiere ningún reinicio):
 ```
 apt-get -y install msmtp
 ```
