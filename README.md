@@ -120,7 +120,7 @@ nano /etc/crontab
 * * * * * root /usr/sbin/UploadFilesToSFTP.sh 5;
 * * * * * root /usr/sbin/UploadFilesToSFTP.sh 6;
 ```
-En la ruta principal del SFTP deben existir las careptas:
+En la ruta principal del SFTP debe existir la siguiente carpeta:
 ```
 speechanalytics
 ```
