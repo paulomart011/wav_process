@@ -205,7 +205,7 @@ mkdir /GrabacionesWAVFailed/qp
 Editar en los archivos UploadFilesToFTP.sh y UploadFailedToFTP.sh las credenciales a usar y el número de random number en base a los nodos con los que se trabajará (en este ejemplo son 6 nodos):
 ```
 ftpuser="usuarioftp"
-ftppassword="paEar0kpgvYDU7GD"
+ftppassword="pwd"
 recordingremotehost="10.150.93.120"
 randomNumber=$(( (RANDOM % 6) + 1 ))
 ```
@@ -469,7 +469,7 @@ En el archivo appSettings.json modificar las siguientes lineas en base a lo requ
   "sftpHost": "usftpcorp.inconcertcc.com",   									//dominio del SFTP
   "sftpPath": "/speechanalytics/",   	     									//ruta raíz del SFTP
   "sftpArchivoLista": "/procesados/listasAudios/", 								//ruta del SFTP donde se depositarán los archivos CSV
-  "sftpFingerPrint": "ssh-ed25519 255 sCK7lIz3IYhHCDmzVl4LhWbN2rdTBi0FOnlet7C9ZQQ",				//fingerprint para conexion al SFTP
+  "sftpFingerPrint": "ssh-ed25519 255 .......",									//fingerprint para conexion al SFTP
   "sftpUsername": "womcolombia-user",										//usuario SFTP
   "sftpPassword": "pwd",											//password SFTP
   "rutaArchivoCSV": "r:\\tmpAudios\\fileDetails.csv",								//ruta del server MW para referenciar la generación del archivo
